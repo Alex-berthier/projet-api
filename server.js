@@ -7,10 +7,10 @@ app.use(cors());
 app.use(express.json());
 
 const connection = mysql.createConnection({
-  host: '192.168.65.83', // L'hôte de la base de données
+  host: '192.168.65.228', // L'hôte de la base de données
   user: 'root', // Votre nom d'utilisateur MySQL
-  password: 'root', // Votre mot de passe MySQL
-  database: 'TD3' // Le nom de votre base de données
+  password: 'T100403w(', // Votre mot de passe MySQL
+  database: 'Projet-api' // Le nom de votre base de données
 });
 
 // Connexion à la base de données
@@ -28,7 +28,7 @@ connection.connect((err) => {
 app.get('/', (req, res) => {
   /*let temp = Math.floor(Math.random() * (36 - (-10) + 1)) + (-10);
   res.send('Bonjour, la température est de !'+temp);*/
-  connection.query('SELECT * FROM Medecin', (err, results) => {
+  connection.query('SELECT * FROM Joueur', (err, results) => {
     if (err) {
       console.error('Erreur lors de l\'exécution de la requête :', err);
       res.status(500).send('Erreur lors de la requête SQL');
@@ -51,18 +51,18 @@ app.listen(port, () => {
 
 app.post('/addUser', (req, res) => {
 
-  const {nom, prenom } = req.body;
+  const {Nom, Prenom, Age } = req.body;
 
   if (!nom || !prenom) {
-    return res.status(400).json({ message: 'nom et prenom requis' });
+    return res.status(400).json({ message: 'nom, prenom et age requis' });
 
   }
 
   // Requête d'insertion
-  const sql = 'INSERT INTO Medecin (nom, prenom) VALUES (?, ?)';
+  const sql = 'INSERT INTO Joueur (Nom, Prenom, Age) VALUES (?, ?, ?)';
 
   // Exécute la requête
-  connection.query(sql, [nom, prenom], (err, results) => {
+  connection.query(sql, [Nom, Prenom, Age], (err, results) => {
     if (err) {
       console.error('Erreur lors de l\'exécution de la requête d\'insertion :', err);
       res.status(500).send('Erreur lors de l\'insertion des données');

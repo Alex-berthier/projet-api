@@ -35,8 +35,10 @@ function appelApi(lelLgin, leMdp) {
 
                 // Créer trois cellules dans la nouvelle ligne
         
-                nouvelleLigne.insertCell(0).innerHTML = responseData.nom;
-                nouvelleLigne.insertCell(1).innerHTML = responseData.prenom;
+                nouvelleLigne.insertCell(0).innerHTML = responseData.Nom;
+                nouvelleLigne.insertCell(1).innerHTML = responseData.Prenom;
+                nouvelleLigne.insertCell(2).innerHTML = responseData.Age;
+
 
 
             } else {
@@ -73,11 +75,13 @@ fetch(apiUrl)
             var row = table.insertRow(i + 0); // +1 pour éviter l'en-tête
             var cell1 = row.insertCell(0);
             var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
 
 
             // Remplissez les cellules avec les données JSON
-            cell1.innerHTML = data[i].nom;
-            cell2.innerHTML = data[i].prenom;
+            cell1.innerHTML = data[i].Nom;
+            cell2.innerHTML = data[i].Prenom;
+            cell3.innerHTML = data[i].Age;
  
         }
 
