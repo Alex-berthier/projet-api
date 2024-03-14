@@ -1,11 +1,15 @@
 const express = require('express');
-const app = express();
 const mysql = require('mysql');
-const port = 3000;
 const cors = require('cors');
+const app = express();
 app.use(cors());
-app.use(express.json());
-
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
+const bodyParser = require('body-parser'); // Ajout du middleware body-parser
+const cookieParser = require('cookie-parser');
+const port = 3000;
+const moment = require('moment');
+app.use(bodyParser.json());
 const connection = mysql.createConnection({
   host: '192.168.65.228', // L'hôte de la base de données
   user: 'userweb', // Votre nom d'utilisateur MySQL
@@ -124,4 +128,49 @@ app.post('/ratio', (req, res) => {
     // Renvoyer le ratio v/d du joueur
     res.json({ ratio_vd: results[0].ratio_vd });
   });
+});
+
+app.post('/Inscription', async (req, res) => {
+  const userUUID = uuidv4();
+
+  if (!req.body) {
+    console.log("Erreur 600: Les champs username et password sont requis.", req.body);
+    return res.status(600).json({ error: 'Les champs username et password sont requis.' });
+  }
+
+  const { identifiant, password } = req.body;
+
+  try {
+    // Vérifier si l'utilisateur existe déjà
+    const userExistsQuery = 'SELECT * FROM User WHERE identifiant = ?';
+    connection.query(userExistsQuery, [identifiant], async (err, results) => {
+      if (err) {
+        console.error('Erreur lors de la vérification de l\'existence de l\'utilisateur :', err);
+        return res.status(500).json({ error: 'Erreur interne du serveur.' });
+      }
+
+      if (results.length > 0) {
+        console.log("Erreur 400: Cet utilisateur existe déjà.");
+        return res.status(400).json({ error: 'Cet utilisateur existe déjà.' });
+      }
+
+      // Hacher le mot de passe
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Insérer l'utilisateur dans la base de données
+      const insertUserQuery = 'INSERT INTO User ( password, uuid) VALUES ( ?, ?)';
+      connection.query(insertUserQuery, [identifiant, hashedPassword, userUUID], (insertErr) => {
+        if (insertErr) {
+          console.error('Erreur lors de l\'enregistrement de l\'utilisateur :', insertErr);
+          return res.status(500).json({ error: 'Erreur interne du serveur.' });
+        }
+
+        console.log("Utilisateur créé avec succès.");
+        res.status(201).json({ message: 'Utilisateur enregistré avec succès.' });
+      });
+    });
+  } catch (error) {
+    console.error('Erreur lors du cryptage du mot de passe :', error);
+    res.status(500).json({ error: 'Erreur interne du serveur.' });
+  }
 });
