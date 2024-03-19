@@ -158,7 +158,7 @@ app.post('/Inscription', async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insérer l'utilisateur dans la base de données
-      const insertUserQuery = 'INSERT INTO User ( password, uuid) VALUES ( ?, ?)';
+      const insertUserQuery = 'INSERT INTO User ( identifiant,password, uuid) VALUES ( ?,?, ?)';
       connection.query(insertUserQuery, [identifiant, hashedPassword, userUUID], (insertErr) => {
         if (insertErr) {
           console.error('Erreur lors de l\'enregistrement de l\'utilisateur :', insertErr);
@@ -173,4 +173,47 @@ app.post('/Inscription', async (req, res) => {
     console.error('Erreur lors du cryptage du mot de passe :', error);
     res.status(500).json({ error: 'Erreur interne du serveur.' });
   }
+});
+
+app.post('/login', async (req, res) => {
+  const { identifiant, password } = req.body;
+
+  const query = 'SELECT * FROM User WHERE identifiant = ?';
+  connection.query(query, [identifiant], async (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la requête à la base de données:', err);
+      return res.status(500).json({ message: 'Erreur du serveur' });
+    }
+
+    if (results.length > 0) {
+      const user = results[0];
+
+      const match = await bcrypt.compare(password, user.password);
+
+      if (match) {
+        const uuidQuery = 'SELECT uuid FROM User WHERE identifiant = ?';
+        connection.query(uuidQuery, [identifiant], (uuidErr, uuidResults) => {
+          if (uuidErr) {
+            console.error('Erreur lors de la récupération du UUID de l\'utilisateur:', uuidErr);
+            return res.status(500).json({ message: 'Erreur du serveur' });
+          }
+
+          if (uuidResults.length > 0) {
+            const userUUID = uuidResults[0].uuid;
+
+
+            res.cookie('userUUID', userUUID, { httpOnly: true });
+            res.status(200).json({ message: 'Connexion réussie', userUUID });
+            console.log("Connexion a un compte effectué")
+          } else {
+            res.status(401).json({ message: 'Identifiant ou mot de passe incorrect' });
+          }
+        });
+      } else {
+        res.status(401).json({ message: 'Identifiant ou mot de passe incorrect' });
+      }
+    } else {
+      res.status(401).json({ message: 'Identifiant ou mot de passe incorrect' });
+    }
+  });
 });

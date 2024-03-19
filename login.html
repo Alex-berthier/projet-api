@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Login</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' type='text/css' media='screen' href='Accueil.css'>
+
+
+</head>
+
+<body>
+  <button id="mainReturn"><strong> ← Retour a l'accueil</strong></button>
+  <script>
+
+    document.getElementById('mainReturn').addEventListener('click', function () {
+      window.location.href = 'accueil.html';
+    });
+
+
+  </script>
+  <div class="loginForm">
+    <form>
+      <p class="formTitle"><strong>Se connecter</strong></p>
+      <div id="resultRegister" style="color: red; margin: 2%;"></div>
+
+      <label for="Username">Nom d'utilisateur</label>
+      <input type="text" name="Username" id="Username_input">
+
+      <label for="Password">Mot de passe</label>
+      <input type="password" name="Password" id="Password_input">
+
+      <div class="LogcontainerSelector">
+        <div id="SubmitLogin" onclick="submitLogin()">Se connecter</div>
+        <script>
+          async function submitLogin() {
+            const usernameInput = document.getElementById('Username_input');
+            const passwordInput = document.getElementById('Password_input');
+            const resultDiv = document.getElementById('resultRegister');
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            usernameInput.value = '';
+            passwordInput.value = '';
+
+            const data = {
+              identifiant: username,
+              password: password
+            };
+
+            try {
+              const response = await fetch('http://192.168.65.83:3000/login', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Basic ' + btoa(username + ':' + password)
+                },
+                body: JSON.stringify(data)
+              });
+
+              if (response.ok) {
+                const result = await response.json();
+                console.log('Réponse du serveur:', result);
+
+                document.cookie = "projet_api_token=" + encodeURIComponent(result.userUUID) + "; max-age=" + (7 * 24 * 60 * 60);
+
+                resultDiv.textContent = 'Connexion réussie!';
+                resultDiv.style.color = 'green';
+                setTimeout(() => {
+                  window.location.href = 'accueil.html';
+                }, 2000);
+              } else {
+                console.error('Erreur lors de la requête:', response.statusText);
+
+                resultDiv.textContent = 'Erreur de connexion. Veuillez réessayer.';
+                resultDiv.style.color = 'red';
+              }
+            } catch (error) {
+              console.error('Erreur lors de la requête:', error.message);
+
+              resultDiv.textContent = 'Erreur de connexion. Veuillez réessayer.';
+              resultDiv.style.color = 'red';
+            }
+          }
+        </script>
+
+        <div id="registerButton2">S'inscrire</div>
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            var registerButton = document.getElementById("registerButton2");
+
+            registerButton.addEventListener("click", function () {
+              window.location.href = "Inscription.html";
+            });
+          });
+        </script>
+      </div>
+    </form>
+  </div>
+  </div>
+</body>
+
+</html>
