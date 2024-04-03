@@ -46,10 +46,6 @@ app.get('/', (req, res) => {
 
 
 
-// Écoute du serveur sur le port spécifié
-app.listen(port, () => {
-  console.log(`Serveur Expre ss en cou  rs d'exécution sur le port ${port}`);
-});
 
 //la commande pour retrouver les PID en écoute est :  lsof -i -P -n | grep LISTEN
 
@@ -216,4 +212,31 @@ app.post('/login', async (req, res) => {
       res.status(401).json({ message: 'Identifiant ou mot de passe incorrect' });
     }
   });
+});
+
+
+app.post('/getuser', (req, res) => {
+  const uuid = req.body.uuid;
+
+  // Requête SQL pour récupérer l'utilisateur associé à l'UUID
+  const sql = `SELECT identifiant FROM User WHERE uuid = ?`;
+  connection.query(sql, [uuid], (error, results, fields) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Erreur lors de la récupération de l\'utilisateur' });
+      return;
+    }
+
+    if (results.length === 0) {
+      res.status(404).json({ error: 'Utilisateur non trouvé' });
+      return;
+    }
+
+    const username = results[0].identifiant;
+    res.json({ username: username });
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Serveur démarré sur le port ${port}`);
 });

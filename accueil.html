@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
   <meta name="keywords"
-    content="Transform Yourself, ​Classes&nbsp;for all levels, ​Formats, ​See more, follow us on, Contact Us">
+    content="Transform Yourself, ​Classes&nbsp;for all levels, ​Formats, ​See more, follow us on, Contact Us"> 
   <meta name="description" content="">
   <title>Accueil</title>
   <link rel="stylesheet" href="nicepage.css" media="screen">
@@ -19,6 +19,7 @@
     href="https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
   <link id="u-page-google-font" rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i">
+
 
 
 
@@ -40,6 +41,42 @@
 
 <body data-path-to-root="./" class="u-body u-xl-mode" data-lang="fr">
   <header class="u-clearfix u-header u-header" id="sec-cdb9">
+    <div id="connected user" style="position: absolute; margin-top: 1%; margin-left: 2%; color: black;">
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = getCookie('projet_api_token');
+        if (token) {
+          try {
+            const response = await fetch('/getuser', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ uuid: token })
+            });
+
+            if (!response.ok) {
+              throw new Error('Erreur lors de la récupération de l\'utilisateur');
+            }
+
+            const data = await response.json();
+            const username = data.username;
+            document.getElementById('connectedUser').innerText = `Connecté en tant que : ${username}`;
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          console.log('Aucun token trouvé');
+        }
+      });
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+    </script>
     <div class="u-clearfix u-sheet u-sheet-1">
       <a href="https://nicepage.com" class="u-image u-logo u-image-1">
         <img src="https://www.clipartkey.com/mpngs/m/16-166894_grass-leaf-brand-tennis-ball-logo-png.png"
@@ -65,7 +102,7 @@
         <div class="u-nav-container">
           <!-- This is where the navigation items are placed -->
           <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2">
-            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Connection.html">Connection</a></li>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="login.html">Connexion</a></li>
             <!-- New list item for the registration button -->
             <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Inscription.html">Inscription</a></li>
           </ul>
@@ -81,7 +118,8 @@
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="index.html">Accueil</a></li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="À-propos-de.html">connection</a></li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Contact.html">inscription</a></li>
-                <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-2-base u-text-grey-90 u-text-hover-palette-2-base"
+                <li class="u-nav-item"><a
+                    class="u-button-style u-nav-link u-text-active-palette-2-base u-text-grey-90 u-text-hover-palette-2-base"
                     href="Cv.html" style="padding: 10px;">Cv</a></li>
               </ul>
             </div>
